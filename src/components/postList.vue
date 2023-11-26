@@ -3,7 +3,10 @@
       <post-item
         v-for="post in posts"
         :title="post.title"
-        :description="post.description"
+        :body="post.body"
+        :user="user(post.userId)"
+        :id="post.id"
+        :key="post.id"
       ></post-item>
   </div>
 </template>
@@ -14,18 +17,19 @@ export default {
   components: {
     postItem
   },
-  data() {
-    return {
-      posts: [
-        {
-          title: 'Название поста 1',
-          description: 'Текст поста 1'
-        },
-        {
-          title: 'Название поста 2',
-          description: 'Текст поста 2'
-        }
-      ]
+  props: {
+    posts: {
+      type: Array,
+      default: []
+    },
+    users: {
+      type:Array,
+      default: []
+    }
+  },
+  methods: {
+    user(id) {
+      return this.users.find(user => user.id === id);
     }
   }
 }
