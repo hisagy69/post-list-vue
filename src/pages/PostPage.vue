@@ -24,7 +24,6 @@
           .then(json => {
             this.post = json;
             this.isLoadData = false;
-            console.log(this.post)
           })
           .catch(e => console.error(e.message));
       },

@@ -15,6 +15,7 @@ export default {
     return {
       posts: [],
       users: [],
+      totalPages: 0,
       page: 1,
       limit: 10,
       isLoadData: false
@@ -27,20 +28,39 @@ export default {
     fetchPosts() {
       this.isLoadData = true;
       return fetch(`https://jsonplaceholder.typicode.com/posts?_limit=${this.limit}&_page=${this.page}`)
-        .then(response => response.json())
-        .then(json => this.posts = json);
+        .then(response => {
+          this.totalPages = response.headers.get('x-total-count') / this.limit;
+          return response.json()
+        })
+        .then(json => this.posts = [...this.posts, ...json])
+        .catch(e => console.error(e));
     },
     fetchUsers() {
       this.isLoadData = true;
       return fetch('https://jsonplaceholder.typicode.com/users')
         .then(response => response.json())
-        .then(json => this.users = json);
+        .then(json => this.users = json)
+        .catch(e => console.error(e));
+    },
+    loadMorePosts() {
+      if (this.totalPages > this.page && !this.isLoadData) {
+        const height = document.body.offsetHeight;
+        const screenHeight = window.innerHeight;
+        const scrolled = window.scrollY;
+        const threshold = screenHeight - height / 4;
+        const position = scrolled + screenHeight;
+        if (position >= threshold) {
+          this.page += 1;
+          this.fetchPosts();
+          this.isLoadData = false;
+        }
+      }
     }
   },
   mounted() {
-      Promise.all([this.fetchPosts(), this.fetchUsers()])
-        .then(() => this.isLoadData = false)
-        .catch(e => console.error(e));
+    Promise.all([this.fetchPosts(), this.fetchUsers()])
+      .then(() => this.isLoadData = false);
+    document.addEventListener('scroll', this.loadMorePosts);
   }
 }
 </script>

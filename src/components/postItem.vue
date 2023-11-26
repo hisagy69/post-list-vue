@@ -1,9 +1,9 @@
 <template>
-  <div class="post__item" @click="$router.push(`post/${id}`)">
+  <article class="post__item" @click="$router.push(`post/${id}`)">
     <p class="post__title">{{ title }}</p>
     <p class="post__text">{{ body }}</p>
     <p class="post__author">{{ user.username }}</p>
-  </div>
+  </article>
 </template>
 
 <script>
