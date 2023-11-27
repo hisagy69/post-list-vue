@@ -1,7 +1,15 @@
 <template>
   <div class="posts">
     <my-title>Главная</my-title>
-    <my-button class="posts__add-button">Добавить пост</my-button>
+    <my-button
+      class="posts__add-button"
+      @click="modalAdd"
+    >Добавить пост</my-button>
+    <my-modal
+      v-if="modalVisible"
+      @update:show="modalClose"
+    ><post-form/>
+    </my-modal>
     <post-list v-if="!isLoadData" :posts="posts" :users="users"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
@@ -9,6 +17,7 @@
 
 <script>
 import postList from '@/components/postList';
+import postForm from '@/components/postForm';
 
 export default {
   data() {
@@ -18,11 +27,13 @@ export default {
       totalPages: 0,
       page: 1,
       limit: 10,
-      isLoadData: false
+      isLoadData: false,
+      modalVisible: false
     }
   },
   components: {
-    postList
+    postList,
+    postForm
   },
   methods: {
     fetchPosts() {
@@ -55,6 +66,12 @@ export default {
           this.isLoadData = false;
         }
       }
+    },
+    modalAdd() {
+      this.modalVisible = true;
+    },
+    modalClose() {
+      this.modalVisible = false;
     }
   },
   mounted() {
