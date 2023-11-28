@@ -11,6 +11,11 @@
         @click="modalAdd"
       >Добавить пост</my-button>
     </div>
+    <my-input
+      v-model="searchQuery"
+      placeholder="Поиск"
+      class="posts__search"
+    />
     <transition name="fade">
       <my-modal
         v-if="modalVisible"
@@ -21,7 +26,7 @@
         />
       </my-modal>
     </transition>
-    <post-list v-if="!isLoadData" :posts="postsSorted" :users="users"/>
+    <post-list v-if="!isLoadData" :posts="postsSortedSearch" :users="users"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
 </template>
@@ -50,7 +55,8 @@ export default {
           name: 'По тексту',
           value: 'body'
         }
-      ]
+      ],
+      searchQuery: ''
     }
   },
   components: {
@@ -104,6 +110,11 @@ export default {
     postsSorted() {
       return [...this.posts].sort((post1, post2) => 
         post1[this.activeSortOption]?.localeCompare(post2[this.activeSortOption]));
+    },
+    postsSortedSearch() {
+      return this.postsSorted.filter(post => {
+        return post.title.toLowerCase().includes(this.searchQuery.toLowerCase());
+      });
     }
   },
   mounted() {
@@ -119,6 +130,10 @@ export default {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
+  margin-bottom: 15px;
+}
+.posts__search {
+  width: 100%;
   margin-bottom: 15px;
 }
 .posts__load {

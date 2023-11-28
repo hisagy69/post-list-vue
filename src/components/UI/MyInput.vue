@@ -27,6 +27,6 @@ export default {
   border: 1px solid #181aa1;
 }
 .input:focus {
-  background-color: #181aa16e;
+  background-color: #181aa115;
 }
 </style>
