@@ -1,5 +1,6 @@
 <template>
   <article class="post__item" @click="$router.push(`post/${id}`)">
+    <button @click.stop="removePost" class="post__remove-button"><img src="@/img/remove-icon.svg" alt="remove"></button>
     <p class="post__title">{{ title }}</p>
     <p class="post__text">{{ body }}</p>
     <p class="post__author">{{ user ? user.username : 'Гость' }}</p>
@@ -23,6 +24,15 @@ export default {
     id: {
       type: Number,
       required: true
+    }
+  },
+  methods: {
+    removePost() {
+      fetch(`https://jsonplaceholder.typicode.com/posts/${this.id}`, {
+        method: 'DELETE',
+      })
+        .catch(e => console.error(e.message))
+        .finally(() => this.$emit('delete', this.id));
     }
   }
 };
@@ -55,5 +65,13 @@ export default {
   color: #000;
   font-style: italic;
   text-align: right;
+}
+.post__remove-button {
+  width: 25px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  margin-left: auto;
+  display: block;
 }
 </style>

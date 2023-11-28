@@ -26,7 +26,11 @@
         />
       </my-modal>
     </transition>
-    <post-list v-if="!isLoadData" :posts="postsSortedSearch" :users="users"/>
+    <post-list
+      v-if="!isLoadData"
+      :posts="postsSortedSearch"
+      :users="users"
+      @delete="removePost"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
 </template>
@@ -105,6 +109,9 @@ export default {
       this.modalClose();
       this.posts = [post, ...this.posts]
     },
+    removePost(id) {
+      this.posts = this.posts.filter(post => post.id !== id);
+    }
   },
   computed: {
     postsSorted() {
