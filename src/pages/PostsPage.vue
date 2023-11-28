@@ -5,14 +5,16 @@
       class="posts__add-button"
       @click="modalAdd"
     >Добавить пост</my-button>
-    <my-modal
-      v-if="modalVisible"
-      @update:show="modalClose"
-    >
-      <post-form
-        @update="addPost"
-      />
-    </my-modal>
+    <transition name="fade">
+      <my-modal
+        v-if="modalVisible"
+        @update:show="modalClose"
+      >
+        <post-form
+          @update="addPost"
+        />
+      </my-modal>
+    </transition>
     <post-list v-if="!isLoadData" :posts="posts" :users="users"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
@@ -98,5 +100,15 @@ export default {
 .posts__load {
   font-size: 50px;
   color: #181aa1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
