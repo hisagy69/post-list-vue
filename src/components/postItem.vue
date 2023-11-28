@@ -2,7 +2,7 @@
   <article class="post__item" @click="$router.push(`post/${id}`)">
     <p class="post__title">{{ title }}</p>
     <p class="post__text">{{ body }}</p>
-    <p class="post__author">{{ user.username }}</p>
+    <p class="post__author">{{ user ? user.username : 'Гость' }}</p>
   </article>
 </template>
 
@@ -18,8 +18,7 @@ export default {
       required: true
     },
     user: {
-      type: Object,
-      required: true
+      type: Object
     },
     id: {
       type: Number,

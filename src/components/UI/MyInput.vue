@@ -1,6 +1,7 @@
 <template>
   <input
     class="input"
+    type="text"
     :value="modelValue"
     @input="updateInput"
   >
@@ -14,7 +15,7 @@ export default {
   },
   methods: {
     updateInput(e) {
-      this.$emmit('update:modelValue', e.target.value);
+      this.$emit('update:modelValue', e.target.value);
     }
   }
 }
@@ -23,5 +24,9 @@ export default {
 <style scoped>
 .input {
   padding: 5px;
+  border: 1px solid #181aa1;
+}
+.input:focus {
+  background-color: #181aa16e;
 }
 </style>

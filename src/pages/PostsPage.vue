@@ -8,7 +8,10 @@
     <my-modal
       v-if="modalVisible"
       @update:show="modalClose"
-    ><post-form/>
+    >
+      <post-form
+        @update="addPost"
+      />
     </my-modal>
     <post-list v-if="!isLoadData" :posts="posts" :users="users"/>
     <div v-else class="posts__load">Загрузка постов...</div>
@@ -72,6 +75,10 @@ export default {
     },
     modalClose() {
       this.modalVisible = false;
+    },
+    addPost(post) {
+      this.modalClose();
+      this.posts = [post, ...this.posts]
     }
   },
   mounted() {
