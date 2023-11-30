@@ -15,29 +15,14 @@ export default {
     return {
       post: {
         title: '',
-        body: '',
-        id: 0,
+        body: ''
       }
     }
   },
   methods: {
     createPost() {
-      fetch('https://jsonplaceholder.typicode.com/posts', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: this.title,
-          body: this.body
-        }),
-        headers: {
-          'Content-type': 'application/json; charset=UTF-8'
-        }
-      })
-        .then(response => response.json())
-        .then(json => {
-          this.id = json.id;
-          this.$emit('update', this.post);
-        })
-        .catch(e => console.error(e.message));
+      this.$store.dispatch('post/createPost', this.post);
+      this.$emit('update');
     }
   }
 }

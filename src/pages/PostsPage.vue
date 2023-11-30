@@ -3,7 +3,8 @@
     <my-title>Главная</my-title>
     <div class="posts__interface">
       <my-select
-        v-model="activeSortOption"
+        :model-value="activeSortOption"
+        @update:model-value="setActiveSort"
         :options="sortOptions"
       />
       <my-button
@@ -12,7 +13,8 @@
       >Добавить пост</my-button>
     </div>
     <my-input
-      v-model="searchQuery"
+      :model-value="searchQuery"
+      @update:model-value="setSearchQuery"
       placeholder="Поиск"
       class="posts__search"
     />
@@ -22,7 +24,7 @@
         @update:show="modalClose"
       >
         <post-form
-          @update="addPost"
+          @update="modalClose"
         />
       </my-modal>
     </transition>
@@ -42,25 +44,7 @@ import postForm from '@/components/postForm';
 export default {
   data() {
     return {
-      posts: [],
-      users: [],
-      totalPages: 0,
-      page: 1,
-      limit: 10,
-      isLoadData: false,
       modalVisible: false,
-      activeSortOption: '',
-      sortOptions: [
-        {
-          name: 'По названию',
-          value: 'title'
-        },
-        {
-          name: 'По тексту',
-          value: 'body'
-        }
-      ],
-      searchQuery: ''
     }
   },
   components: {
@@ -68,34 +52,17 @@ export default {
     postForm
   },
   methods: {
-    fetchPosts() {
-      this.isLoadData = true;
-      return fetch(`https://jsonplaceholder.typicode.com/posts?_limit=${this.limit}&_page=${this.page}`)
-        .then(response => {
-          this.totalPages = response.headers.get('x-total-count') / this.limit;
-          return response.json()
-        })
-        .then(json => this.posts = [...this.posts, ...json])
-        .catch(e => console.error(e));
-    },
-    fetchUsers() {
-      this.isLoadData = true;
-      return fetch('https://jsonplaceholder.typicode.com/users')
-        .then(response => response.json())
-        .then(json => this.users = json)
-        .catch(e => console.error(e));
-    },
     loadMorePosts() {
-      if (this.totalPages > this.page && !this.isLoadData) {
+      if (this.$store.state.post.totalPages > this.$store.state.post.page && !this.$store.state.post.isLoadData) {
         const height = document.body.offsetHeight;
         const screenHeight = window.innerHeight;
         const scrolled = window.scrollY;
         const threshold = screenHeight - height / 4;
         const position = scrolled + screenHeight;
         if (position >= threshold) {
-          this.page += 1;
-          this.fetchPosts();
-          this.isLoadData = false;
+          this.$store.commit('post/setPage', this.$store.state.post.page + 1);
+          this.$store.dispatch('post/fetchPosts');
+          this.$store.commit('post/setIsLoadData', false);
         }
       }
     },
@@ -105,28 +72,39 @@ export default {
     modalClose() {
       this.modalVisible = false;
     },
-    addPost(post) {
-      this.modalClose();
-      this.posts = [post, ...this.posts]
-    },
     removePost(id) {
-      this.posts = this.posts.filter(post => post.id !== id);
+      this.$store.commit('post/removePost', id);
+    },
+    setActiveSort(activeSort) {
+      this.$store.commit('post/setActiveSortOption', activeSort);
+    },
+    setSearchQuery(query) {
+      this.$store.commit('post/setSearchQuery', query);
     }
   },
   computed: {
-    postsSorted() {
-      return [...this.posts].sort((post1, post2) => 
-        post1[this.activeSortOption]?.localeCompare(post2[this.activeSortOption]));
+    activeSortOption() {
+      return this.$store.state.post.activeSortOption;
+    },
+    sortOptions() {
+      return this.$store.state.post.sortOptions;
+    },
+    searchQuery() {
+      return this.$store.state.post.searchQuery;
+    },
+    isLoadData() {
+      return this.$store.state.post.isLoadData;
     },
     postsSortedSearch() {
-      return this.postsSorted.filter(post => {
-        return post.title.toLowerCase().includes(this.searchQuery.toLowerCase());
-      });
+      return this.$store.getters['post/postsSortedSearch'];
+    },
+    users() {
+      return this.$store.state.post.users;
     }
   },
   mounted() {
-    Promise.all([this.fetchPosts(), this.fetchUsers()])
-      .then(() => this.isLoadData = false);
+    Promise.all([this.$store.dispatch('post/fetchPosts'), this.$store.dispatch('post/fetchUsers')])
+      .then(() => this.$store.commit('post/setIsLoadData', false));
     document.addEventListener('scroll', this.loadMorePosts);
   }
 }
