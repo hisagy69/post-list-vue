@@ -101,6 +101,13 @@ export default {
           commit('setPost', {...post, id: json.id});
         })
         .catch(e => console.error(e.message));
+    },
+    deletePost({commit}, id) {
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+        method: 'DELETE',
+      })
+        .catch(e => console.error(e.message))
+        .finally(() => commit('removePost', id));
     }
   }
 };

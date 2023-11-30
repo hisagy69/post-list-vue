@@ -28,11 +28,7 @@ export default {
   },
   methods: {
     removePost() {
-      fetch(`https://jsonplaceholder.typicode.com/posts/${this.id}`, {
-        method: 'DELETE',
-      })
-        .catch(e => console.error(e.message))
-        .finally(() => this.$emit('delete', this.id));
+      this.$store.dispatch('post/deletePost', this.id);
     }
   }
 };

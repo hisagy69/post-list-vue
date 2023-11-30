@@ -10,7 +10,6 @@
         :user="user(post.userId)"
         :id="post.id"
         :key="post.id"
-        @delete="removePost"
       ></post-item>
     </transition-group>
   </div>
@@ -35,9 +34,6 @@ export default {
   methods: {
     user(id) {
       return this.users.find(user => user.id === id);
-    },
-    removePost(id) {
-      this.$emit('delete', id);
     }
   },
 }

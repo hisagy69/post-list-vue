@@ -4,7 +4,7 @@
     <div class="posts__interface">
       <my-select
         :model-value="activeSortOption"
-        @update:model-value="setActiveSort"
+        @update:model-value="setActiveSortOption"
         :options="sortOptions"
       />
       <my-button
@@ -31,8 +31,7 @@
     <post-list
       v-if="!isLoadData"
       :posts="postsSortedSearch"
-      :users="users"
-      @delete="removePost"/>
+      :users="users"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
 </template>
@@ -40,6 +39,7 @@
 <script>
 import postList from '@/components/postList';
 import postForm from '@/components/postForm';
+import {mapState, mapGetters, mapActions, mapMutations} from 'vuex';
 
 export default {
   data() {
@@ -52,17 +52,27 @@ export default {
     postForm
   },
   methods: {
+    ...mapActions({
+      fetchPosts: 'post/fetchPosts',
+      fetchUsers: 'post/fetchUsers',
+    }),
+    ...mapMutations({
+      setPage: 'post/setPage',
+      setIsLoadData: 'post/setIsLoadData',
+      setActiveSortOption: 'post/setActiveSortOption',
+      setSearchQuery: 'post/setSearchQuery'
+    }),
     loadMorePosts() {
-      if (this.$store.state.post.totalPages > this.$store.state.post.page && !this.$store.state.post.isLoadData) {
+      if (this.totalPages > this.page && !this.isLoadData) {
         const height = document.body.offsetHeight;
         const screenHeight = window.innerHeight;
         const scrolled = window.scrollY;
         const threshold = screenHeight - height / 4;
         const position = scrolled + screenHeight;
         if (position >= threshold) {
-          this.$store.commit('post/setPage', this.$store.state.post.page + 1);
-          this.$store.dispatch('post/fetchPosts');
-          this.$store.commit('post/setIsLoadData', false);
+          this.setPage(this.page + 1);
+          this.fetchPosts();
+          this.setIsLoadData(false);
         }
       }
     },
@@ -71,40 +81,25 @@ export default {
     },
     modalClose() {
       this.modalVisible = false;
-    },
-    removePost(id) {
-      this.$store.commit('post/removePost', id);
-    },
-    setActiveSort(activeSort) {
-      this.$store.commit('post/setActiveSortOption', activeSort);
-    },
-    setSearchQuery(query) {
-      this.$store.commit('post/setSearchQuery', query);
     }
   },
   computed: {
-    activeSortOption() {
-      return this.$store.state.post.activeSortOption;
-    },
-    sortOptions() {
-      return this.$store.state.post.sortOptions;
-    },
-    searchQuery() {
-      return this.$store.state.post.searchQuery;
-    },
-    isLoadData() {
-      return this.$store.state.post.isLoadData;
-    },
-    postsSortedSearch() {
-      return this.$store.getters['post/postsSortedSearch'];
-    },
-    users() {
-      return this.$store.state.post.users;
-    }
+    ...mapState({
+      activeSortOption: state => state.post.activeSortOption,
+      sortOptions: state => state.post.sortOptions,
+      searchQuery: state => state.post.searchQuery,
+      isLoadData: state => state.post.isLoadData,
+      users: state => state.post.users,
+      totalPages: state => state.post.totalPages,
+      page: state => state.post.page
+    }),
+    ...mapGetters({
+      postsSortedSearch: 'post/postsSortedSearch'
+    })
   },
   mounted() {
-    Promise.all([this.$store.dispatch('post/fetchPosts'), this.$store.dispatch('post/fetchUsers')])
-      .then(() => this.$store.commit('post/setIsLoadData', false));
+    Promise.all([this.fetchPosts(), this.fetchUsers()])
+      .then(() => this.setIsLoadData(false));
     document.addEventListener('scroll', this.loadMorePosts);
   }
 }
