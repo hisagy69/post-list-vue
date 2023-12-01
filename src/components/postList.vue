@@ -4,10 +4,9 @@
       name="list"
     >
       <post-item
-        v-for="post in posts"
+        v-for="post in postsSortedSearch"
         :title="post.title"
         :body="post.body"
-        :user="user(post.userId)"
         :id="post.id"
         :key="post.id"
       ></post-item>
@@ -17,25 +16,19 @@
 
 <script>
 import postItem from '@/components/postItem';
+import {mapState, mapGetters} from 'vuex';
 export default {
   components: {
     postItem
   },
-  props: {
-    posts: {
-      type: Array,
-      default: []
-    },
-    users: {
-      type:Array,
-      default: []
-    }
-  },
-  methods: {
-    user(id) {
-      return this.users.find(user => user.id === id);
-    }
-  },
+  computed: {
+    ...mapState({
+      posts: state => state.post.posts
+    }),
+    ...mapGetters({
+      postsSortedSearch: 'post/postsSortedSearch'
+    })
+  }
 }
 </script>
 

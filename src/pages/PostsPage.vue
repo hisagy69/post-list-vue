@@ -28,10 +28,7 @@
         />
       </my-modal>
     </transition>
-    <post-list
-      v-if="!isLoadData"
-      :posts="postsSortedSearch"
-      :users="users"/>
+    <post-list v-if="!isLoadData"/>
     <div v-else class="posts__load">Загрузка постов...</div>
   </div>
 </template>
@@ -89,13 +86,9 @@ export default {
       sortOptions: state => state.post.sortOptions,
       searchQuery: state => state.post.searchQuery,
       isLoadData: state => state.post.isLoadData,
-      users: state => state.post.users,
       totalPages: state => state.post.totalPages,
       page: state => state.post.page
     }),
-    ...mapGetters({
-      postsSortedSearch: 'post/postsSortedSearch'
-    })
   },
   mounted() {
     Promise.all([this.fetchPosts(), this.fetchUsers()])

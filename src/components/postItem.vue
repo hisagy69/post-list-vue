@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import {mapState} from 'vuex';
+
 export default {
   props: {
     title: {
@@ -18,9 +20,6 @@ export default {
       type: String,
       required: true
     },
-    user: {
-      type: Object
-    },
     id: {
       type: Number,
       required: true
@@ -29,6 +28,14 @@ export default {
   methods: {
     removePost() {
       this.$store.dispatch('post/deletePost', this.id);
+    }
+  },
+  computed: {
+    ...mapState({
+      users: state => state.post.users
+    }),
+    user() {
+      return this.users.find(user => user.id === this.id);
     }
   }
 };
