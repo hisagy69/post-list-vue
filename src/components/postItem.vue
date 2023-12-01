@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     ...mapState({
-      users: state => state.post.users
+      users: state => state.user.users
     }),
     user() {
       return this.users.find(user => user.id === this.id);

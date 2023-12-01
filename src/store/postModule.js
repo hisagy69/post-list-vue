@@ -2,7 +2,6 @@ export default {
   namespaced: true,
   state: {
     posts: [],
-    users: [],
     totalPages: 0,
     page: 1,
     limit: 10,
@@ -34,9 +33,6 @@ export default {
   mutations: {
     setPosts(state, posts) {
       state.posts = posts;
-    },
-    setUsers(state, users) {
-      state.users = users;
     },
     setTotalPages(state, totalPages) {
       state.totalPages = totalPages;
@@ -76,14 +72,8 @@ export default {
           return response.json()
         })
         .then(json => commit('setPosts', [...state.posts, ...json]))
-        .catch(e => console.error(e));
-    },
-    fetchUsers({commit}) {
-      commit('setIsLoadData', true);
-      return fetch('https://jsonplaceholder.typicode.com/users')
-        .then(response => response.json())
-        .then(json => commit('setUsers', json))
-        .catch(e => console.error(e));
+        .catch(e => console.error(e))
+        .finally(() => commit('setIsLoadData', false));
     },
     createPost({commit}, post) {
       fetch('https://jsonplaceholder.typicode.com/posts', {

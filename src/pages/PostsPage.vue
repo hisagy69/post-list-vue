@@ -36,7 +36,7 @@
 <script>
 import postList from '@/components/postList';
 import postForm from '@/components/postForm';
-import {mapState, mapGetters, mapActions, mapMutations} from 'vuex';
+import {mapState, mapActions, mapMutations} from 'vuex';
 
 export default {
   data() {
@@ -51,11 +51,11 @@ export default {
   methods: {
     ...mapActions({
       fetchPosts: 'post/fetchPosts',
-      fetchUsers: 'post/fetchUsers',
+      fetchUsers: 'user/fetchUsers'
     }),
     ...mapMutations({
       setPage: 'post/setPage',
-      setIsLoadData: 'post/setIsLoadData',
+      setIsLoadDataPosts: 'post/setIsLoadData',
       setActiveSortOption: 'post/setActiveSortOption',
       setSearchQuery: 'post/setSearchQuery'
     }),
@@ -69,7 +69,7 @@ export default {
         if (position >= threshold) {
           this.setPage(this.page + 1);
           this.fetchPosts();
-          this.setIsLoadData(false);
+          this.setIsLoadDataPosts(false);
         }
       }
     },
@@ -85,14 +85,14 @@ export default {
       activeSortOption: state => state.post.activeSortOption,
       sortOptions: state => state.post.sortOptions,
       searchQuery: state => state.post.searchQuery,
-      isLoadData: state => state.post.isLoadData,
+      isLoadData: state => state.post.isLoadData && state.user.isLoadData,
       totalPages: state => state.post.totalPages,
       page: state => state.post.page
     }),
   },
   mounted() {
-    Promise.all([this.fetchPosts(), this.fetchUsers()])
-      .then(() => this.setIsLoadData(false));
+    this.fetchPosts();
+    this.fetchUsers();
     document.addEventListener('scroll', this.loadMorePosts);
   }
 }
