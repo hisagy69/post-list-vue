@@ -1,5 +1,9 @@
 <template>
-  <div class="post">
+  <div class="post" v-if="post.id">
+    <my-button
+      class="button-back post__button-back"
+      @click="$router.go(-1)"
+    >Назад</my-button>
     <div class="post__wrap" v-if="!isLoadPost && !isLoadUser">
       <my-title class="post__title">{{ post.title }}</my-title>
       <p class="post__text">{{ post.body }}</p>
@@ -11,12 +15,17 @@
     </div>
     <div v-else class="posts__load">Загрузка поста...</div>
   </div>
+  <not-found-page v-else></not-found-page>
 </template>
 
 <script>
-import {mapActions, mapState} from 'vuex';
+import {mapActions, mapState, mapMutations} from 'vuex';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 export default {
+  components: {
+    NotFoundPage
+  },
   computed: mapState({
     post: state => state.post.post,
     isLoadPost: state => state.post.isLoadData,
@@ -27,20 +36,31 @@ export default {
     ...mapActions({
       fetchPost: 'post/fetchPost',
       fetchUser: 'user/fetchUser'
+    }),
+    ...mapMutations({
+      setUser: 'user/setUser'
     })
   },
   mounted() {
     this.fetchPost(this.$route.params.id);
   },
+  unmounted() {
+    this.setUser({});
+  },
   watch: {
     isLoadPost() {
-      this.fetchUser(this.post.userId);
+      if (this.post?.userId) {
+        this.fetchUser(this.post.userId);
+      }
     }
   }
 }
 </script>
 
 <style scoped>
+.post__button-back {
+  margin-top: 30px;
+}
 .post__text {
   margin-bottom: 70px;
 }
