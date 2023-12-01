@@ -2,6 +2,7 @@ export default {
   namespaced: true,
   state: {
     posts: [],
+    post: {},
     totalPages: 0,
     page: 1,
     limit: 10,
@@ -55,11 +56,14 @@ export default {
     setSearchQuery(state, searchQuery) {
       state.searchQuery = searchQuery;
     },
-    setPost(state, post) {
+    addPost(state, post) {
       state.posts = [post, ...state.posts]
     },
     removePost(state, id) {
       state.posts = state.posts.filter(post => post.id !== id);
+    },
+    setPost(state, post) {
+      state.post = post;
     }
   },
   actions: {
@@ -87,9 +91,7 @@ export default {
         }
       })
         .then(response => response.json())
-        .then(json => {
-          commit('setPost', {...post, id: json.id});
-        })
+        .then(json => commit('addPost', {...post, id: json.id}))
         .catch(e => console.error(e.message));
     },
     deletePost({commit}, id) {
@@ -98,6 +100,14 @@ export default {
       })
         .catch(e => console.error(e.message))
         .finally(() => commit('removePost', id));
-    }
+    },
+    fetchPost({commit}, id) {
+      commit('setIsLoadData', true);
+      return fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
+        .then(response => response.json())
+        .then(json => commit('setPost', json))
+        .catch(e => console.error(e.message))
+        .finally(() => commit('setIsLoadData', false));
+    },
   }
 };

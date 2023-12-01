@@ -1,39 +1,56 @@
 <template>
   <div class="post">
-    <div class="post__wrap" v-if="!isLoadData">
+    <div class="post__wrap" v-if="!isLoadPost && !isLoadUser">
       <my-title class="post__title">{{ post.title }}</my-title>
       <p class="post__text">{{ post.body }}</p>
+      <div class="post__autor">
+        <span class="post__username">Author: <strong>{{ user.username }}</strong></span>
+        <span class="post__user-email">Email: <strong><a :href="user.email">{{ user.email }}</a></strong></span>
+        <span class="post__user-site">website: <a :href="user.website">{{ user.website }}</a></span>
+      </div>
     </div>
-    <div v-else class="posts__load">Загрузка постов...</div>
+    <div v-else class="posts__load">Загрузка поста...</div>
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        isLoadData: false,
-        post: {}
-      }
-    },
-    methods: {
-      fetchPost() {
-        this.isLoadData = true;
-        return fetch(`https://jsonplaceholder.typicode.com/posts/${this.$route.params.id}`)
-          .then(response => response.json())
-          .then(json => {
-            this.post = json;
-            this.isLoadData = false;
-          })
-          .catch(e => console.error(e.message));
-      },
-    },
-    mounted() {
-      this.fetchPost();
+import {mapActions, mapState} from 'vuex';
+
+export default {
+  computed: mapState({
+    post: state => state.post.post,
+    isLoadPost: state => state.post.isLoadData,
+    isLoadUser: state => state.user.isLoadData,
+    user: state => state.user.user
+  }),
+  methods: {
+    ...mapActions({
+      fetchPost: 'post/fetchPost',
+      fetchUser: 'user/fetchUser'
+    })
+  },
+  mounted() {
+    this.fetchPost(this.$route.params.id);
+  },
+  watch: {
+    isLoadPost() {
+      this.fetchUser(this.post.userId);
     }
   }
+}
 </script>
 
 <style scoped>
-
+.post__text {
+  margin-bottom: 70px;
+}
+.post__autor {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  width: fit-content;
+}
+.post__username, .post__user-email {
+  margin-bottom: 15px;
+}
 </style>
