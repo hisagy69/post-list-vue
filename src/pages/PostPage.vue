@@ -12,6 +12,7 @@
         <span class="post__user-email">Email: <strong><a :href="user.email">{{ user.email }}</a></strong></span>
         <span class="post__user-site">website: <a :href="user.website">{{ user.website }}</a></span>
       </div>
+      <comment-list/>
     </div>
     <div v-else class="posts__load">Загрузка поста...</div>
   </div>
@@ -21,10 +22,12 @@
 <script>
 import {mapActions, mapState, mapMutations} from 'vuex';
 import NotFoundPage from '@/pages/NotFoundPage';
+import commentList from '@/components/commentList';
 
 export default {
   components: {
-    NotFoundPage
+    NotFoundPage,
+    commentList
   },
   computed: mapState({
     post: state => state.post.post,
@@ -67,8 +70,9 @@ export default {
 .post__autor {
   display: flex;
   flex-direction: column;
-  margin-left: auto;
   width: fit-content;
+  margin-left: auto;
+  margin-bottom: 50px;
 }
 .post__username, .post__user-email {
   margin-bottom: 15px;
