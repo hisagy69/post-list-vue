@@ -1,5 +1,5 @@
 <template>
-  <div class="posts__list">
+  <div class="posts__list" ref="list" @scroll="loadMorePosts">
     <transition-group
       name="list"
     >
@@ -16,14 +16,38 @@
 
 <script>
 import postItem from '@/components/postItem';
-import {mapState, mapGetters} from 'vuex';
+import {mapState, mapGetters, mapMutations, mapActions} from 'vuex';
 export default {
   components: {
     postItem
   },
+  methods: {
+    ...mapMutations({
+      setPage: 'post/setPage',
+      setIsLoadDataPosts: 'post/setIsLoadData'
+    }),
+    ...mapActions({
+      fetchPosts: 'post/fetchPosts'
+    }),
+    loadMorePosts() {
+      if (this.totalPages > this.page && !this.isLoadData) {
+        const height = this.$refs.list.offsetHeight;
+        const scrolled = this.$refs.list.scrollTop;
+        const scrollHeight = this.$refs.list.scrollHeight;
+        if (scrollHeight - scrolled <= height) {
+          this.setPage(this.page + 1);
+          this.fetchPosts();
+          this.setIsLoadDataPosts(false);
+        }
+      }
+    }
+  },
   computed: {
     ...mapState({
-      posts: state => state.post.posts
+      posts: state => state.post.posts,
+      totalPages: state => state.post.totalPages,
+      page: state => state.post.page,
+      isLoadData: state => state.post.isLoadData
     }),
     ...mapGetters({
       postsSortedSearch: 'post/postsSortedSearch'
@@ -36,6 +60,15 @@ export default {
 .posts__list {
   margin: 0 auto;
   max-width: 100%;
+  overflow-y: auto;
+  height: 70%;
+}
+.posts__list::-webkit-scrollbar {
+  width: 20px;
+}
+.posts__list::-webkit-scrollbar-thumb {
+  background-color: #181aa1;
+  border-radius: 5px;
 }
 .list-item {
   display: inline-block;

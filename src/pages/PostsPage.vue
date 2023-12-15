@@ -54,25 +54,9 @@ export default {
       fetchUsers: 'user/fetchUsers'
     }),
     ...mapMutations({
-      setPage: 'post/setPage',
-      setIsLoadDataPosts: 'post/setIsLoadData',
       setActiveSortOption: 'post/setActiveSortOption',
       setSearchQuery: 'post/setSearchQuery'
     }),
-    loadMorePosts() {
-      if (this.totalPages > this.page && !this.isLoadData) {
-        const height = document.body.offsetHeight;
-        const screenHeight = window.innerHeight;
-        const scrolled = window.scrollY;
-        const threshold = screenHeight - height / 4;
-        const position = scrolled + screenHeight;
-        if (position >= threshold) {
-          this.setPage(this.page + 1);
-          this.fetchPosts();
-          this.setIsLoadDataPosts(false);
-        }
-      }
-    },
     modalAdd() {
       this.modalVisible = true;
     },
@@ -86,19 +70,20 @@ export default {
       sortOptions: state => state.post.sortOptions,
       searchQuery: state => state.post.searchQuery,
       isLoadData: state => state.post.isLoadData && state.user.isLoadData,
-      totalPages: state => state.post.totalPages,
-      page: state => state.post.page
     }),
   },
   mounted() {
     this.fetchPosts();
     this.fetchUsers();
-    document.addEventListener('scroll', this.loadMorePosts);
   }
 }
 </script>
 
 <style scoped>
+.posts {
+  overflow-y: hidden;
+  height: 100vh;
+}
 .posts__interface {
   display: flex;
   align-items: stretch;
